@@ -7,9 +7,19 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure database
-builder.Services.AddDbContext<PetPalDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PetPalDbConnectionString")));
+// Configure database based on environment
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    // For testing, use in-memory database
+    builder.Services.AddDbContext<PetPalDbContext>(options =>
+        options.UseInMemoryDatabase("PetPalDbConnectionString"));
+}
+else
+{
+    // For development and production, use PostgreSQL
+    builder.Services.AddDbContext<PetPalDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("PetPalDbConnectionString")));
+}
 
 // Configure Identity
 builder.Services.AddIdentityCore<IdentityUser>(options =>
@@ -139,4 +149,4 @@ app.MapAppointmentEndpoints();
 
 app.Run();
 
-// remove this comment
+public partial class Program { }

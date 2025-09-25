@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace PetPal.Tests;
 
 public class UnitTest1
