@@ -12,6 +12,9 @@ public class MappingProfiles : Profile
         // User Profile mappings
         CreateMap<UserProfile, UserProfileDto>();
         CreateMap<RegistrationDto, UserProfile>();
+        CreateMap<UserUpdateDto, UserProfile>();
+        CreateMap<UserUpdateDto, UserUpdateResponseDto>()
+            .ForMember(dest => dest.User, opt => opt.MapFrom(src => src));
 
         // Pet mappings
         CreateMap<Pet, PetDto>();
