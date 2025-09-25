@@ -55,7 +55,6 @@ public static class TestHelper
             Email = adminEmail,
             EmailConfirmed = true
         };
-        
 
         await userManager.CreateAsync(adminUser, "Admin123!");
 
@@ -129,20 +128,23 @@ public static class TestHelper
         dbContext.SaveChanges();
 
     }
-
-
-
-    public static async Task RegisterAuthAsync(HttpClient client, LoginDto login)
-    {
-        // Console.WriteLine(jsonContent);
-        await client.PostAsJsonAsync("/auth/login", login);
-    }
     public static async Task<List<PetDto>> GetAllPetsAsync(HttpClient client)
     {
         var response = await client.GetAsync("/pets");
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<List<PetDto>>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+    }
+    
+    public static async Task<UserUpdateResponseDto> UpdateUserProfileAsync(HttpClient client, UserUpdateDto userUpdateDto, int id)
+    {
+        var response = await client.PutAsJsonAsync($"/users/{id}", userUpdateDto);
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<UserUpdateResponseDto>(content, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         });
