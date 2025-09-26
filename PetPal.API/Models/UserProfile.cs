@@ -15,4 +15,10 @@ public class UserProfile
     public List<PetOwner> OwnedPets { get; set; } = new List<PetOwner>();
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    
+
+     public string Theme { get; set; } = "light";
+    public string ColorAccent { get; set; } = "#4a90e2";
+    public string FontSize { get; set; } = "medium";
+    public bool UseSystemPreference { get; set; } = false;
 }

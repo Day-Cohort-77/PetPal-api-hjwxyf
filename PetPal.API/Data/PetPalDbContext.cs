@@ -36,6 +36,24 @@ public class PetPalDbContext : IdentityDbContext<IdentityUser>
                 }
             }
         }
+      
+     
+
+modelBuilder.Entity<UserProfile>()
+    .Property(p => p.Theme)
+    .HasDefaultValue("light");
+
+modelBuilder.Entity<UserProfile>()
+    .Property(p => p.ColorAccent)
+    .HasDefaultValue("#4a90e2");
+
+modelBuilder.Entity<UserProfile>()
+    .Property(p => p.FontSize)
+    .HasDefaultValue("medium");
+
+modelBuilder.Entity<UserProfile>()
+    .Property(p => p.UseSystemPreference)
+    .HasDefaultValue(false);
 
         // Configure PetOwner as a join table
         modelBuilder.Entity<PetOwner>()

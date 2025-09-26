@@ -145,6 +145,7 @@ app.MapHealthRecordEndpoints();
 // TODO: Map other endpoints
 app.MapAppointmentEndpoints();
 app.MapUserProfileEndpoints();
+app.MapThemeSettingEndpoints();
 // app.MapMedicationEndpoints();
 // app.MapVeterinarianEndpoints();
 
