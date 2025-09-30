@@ -11,7 +11,7 @@ public static class ThemeSettingEndpoints
 {
     public static void MapThemeSettingEndpoints(this WebApplication app)
     {
-        app.MapGet("/api/theme-settings/{userId}", async (
+        app.MapGet("/api/theme-settings", async (
        ClaimsPrincipal user,
        PetPalDbContext db) =>
    {
@@ -153,18 +153,24 @@ app.MapDelete("/api/theme-settings", async (
     }
 
     // Reset to default values
-    userProfile.Theme = "light";
-    userProfile.ColorAccent = "#4a90e2";
-    userProfile.FontSize = "medium";
-    userProfile.UseSystemPreference = false;
-    userProfile.UpdatedAt = DateTime.UtcNow;
-
+    userProfile.Theme = "light";             // App default
+    userProfile.ColorAccent = "#4a90e2";     // App default
+    userProfile.FontSize = "medium";         // App default
+    userProfile.UseSystemPreference = false; // App default
+    
     await db.SaveChangesAsync();
 
-    return Results.Ok(new 
+     return Results.Ok(new
     {
         success = true,
-        message = "Theme preferences reset to defaults successfully"
+        message = "Theme preferences reset to defaults",
+        preferences = new
+        {
+            theme = userProfile.Theme,
+            colorAccent = userProfile.ColorAccent,
+            fontSize = userProfile.FontSize,
+            useSystemPreference = userProfile.UseSystemPreference
+        }
     });
 }).RequireAuthorization();
     }

@@ -69,7 +69,13 @@ public static class TestHelper
             Phone = "555-123-4567",
             IdentityUserId = adminUser.Id,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+
+            //theme settings will use default values
+            Theme = "light",
+            ColorAccent = "#4a90e2",
+            FontSize = "medium",
+            UseSystemPreference = false
         };
 
         context.UserProfiles.Add(adminProfile);

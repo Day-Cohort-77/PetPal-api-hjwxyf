@@ -71,7 +71,7 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
 
   }
 
-    [Fact]
+  [Fact]
   public async Task UpdateUserProfile_ReturnsUserUpdateResponseDto()
   {
     // Arrange
@@ -106,6 +106,124 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     Assert.Equal("125 Admin St", response.User.Address);
 
   }
+  [Fact]
+  public async Task GetThemeSettings_ReturnsThemePreferences()
+  {
+  
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await _authenticated_client.GetAsync("/api/theme-settings");
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    var content = await response.Content.ReadAsStringAsync();
+
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    var result = JsonConvert.DeserializeObject<dynamic>(content);
+    Assert.NotNull(result);
+    Assert.True((bool)result.success);
+    Assert.Equal("Theme preferences retrieved successfully", (string)result.message);
+
+  
+    Assert.NotNull(result.preferences);
+    Assert.Equal("light", (string)result.preferences.theme);
+    Assert.Equal("#4a90e2", (string)result.preferences.colorAccent);
+    Assert.Equal("medium", (string)result.preferences.fontSize);
+    Assert.False((bool)result.preferences.useSystemPreference);
+  }
+  [Fact]
+  public async Task UpdateThemeSettings_ReturnsUpdatedThemeSettingsDto()
+  {
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    var updateThemeDto = new UpdateThemeDto
+    {
+      Theme = "light",
+      ColorAccent = "#4a90e2",
+      FontSize = "medium",
+      UseSystemPreference = true
+    };
+
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await _authenticated_client.PutAsJsonAsync("/api/theme-settings", updateThemeDto);
+    var content = await response.Content.ReadAsStringAsync();
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    var result = JsonConvert.DeserializeObject<dynamic>(content);
+    Assert.NotNull(result);
+
+    
+    Assert.Equal("light", (string)result.preferences.theme);
+    Assert.Equal("#4a90e2", (string)result.preferences.colorAccent);
+    Assert.Equal("medium", (string)result.preferences.fontSize);
+    Assert.True((bool)result.preferences.useSystemPreference);
+  }
+
+[Fact]
+ public async Task CreateTheme_ReturnsCreateThemeDto()
+  {
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    var createThemeDto = new CreateThemeDto
+    {
+      Theme = "light",
+      ColorAccent = "#4a90e2",
+      FontSize = "medium",
+      UseSystemPreference = false
+    };
+   
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await _authenticated_client.PostAsJsonAsync("/api/theme-settings" , createThemeDto);
+    var content = await response.Content.ReadAsStringAsync(); Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    var result = JsonConvert.DeserializeObject<dynamic>(content);
+    Assert.NotNull(result);
+
+
+    Assert.Equal("light", (string)result.preferences.theme);
+    Assert.Equal("#4a90e2", (string)result.preferences.colorAccent);
+    Assert.Equal("medium", (string)result.preferences.fontSize);
+    Assert.False((bool)result.preferences.useSystemPreference);
+  }
+  [Fact]
+  public async Task DeleteThemeSettings_ResetsToDefaults()
+  {
+
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+
+
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await _authenticated_client.DeleteAsync("/api/theme-settings");
+    var content = await response.Content.ReadAsStringAsync();
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    var result = JsonConvert.DeserializeObject<dynamic>(content);
+    Assert.NotNull(result);
+
+
+   
+    var getResponse = await _authenticated_client.GetAsync("/api/theme-settings");
+    var getContent = await getResponse.Content.ReadAsStringAsync();
+    var getResult = JsonConvert.DeserializeObject<dynamic>(getContent);
+    
+    Assert.Equal("light", (string)getResult.preferences.theme);        
+    Assert.Equal("#4a90e2", (string)getResult.preferences.colorAccent); 
+    Assert.Equal("medium", (string)getResult.preferences.fontSize);     
+    Assert.False((bool)getResult.preferences.useSystemPreference);     
+}
+
   public void Dispose()
   {
     _client.Dispose();
