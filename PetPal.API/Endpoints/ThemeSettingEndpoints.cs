@@ -10,7 +10,7 @@ namespace PetPal.API.Endpoints;
 public static class ThemeSettingEndpoints
 {
     public static void MapThemeSettingEndpoints(this WebApplication app)
-    {
+    {   //get user theme preferences
         app.MapGet("/api/theme-settings", async (
        ClaimsPrincipal user,
        PetPalDbContext db) =>
@@ -29,7 +29,7 @@ public static class ThemeSettingEndpoints
            return Results.NotFound("User profile not found.");
        }
 
-       // Return in the format your teacher specified
+      
        return Results.Ok(new
        {
            success = true,
@@ -46,7 +46,7 @@ public static class ThemeSettingEndpoints
        });
    }).RequireAuthorization();
 
-
+        // save user theme preferences
         app.MapPost("/api/theme-settings", async (
             ClaimsPrincipal user,
             PetPalDbContext db,
@@ -66,7 +66,7 @@ public static class ThemeSettingEndpoints
                 return Results.NotFound("User profile not found.");
             }
 
-            // Update the theme properties
+           
             userProfile.Theme = request.Theme ?? "light";
             userProfile.ColorAccent = request.ColorAccent ?? "#4a90e2";
             userProfile.FontSize = request.FontSize ?? "medium";
@@ -75,7 +75,7 @@ public static class ThemeSettingEndpoints
 
             await db.SaveChangesAsync();
 
-            // Return the same format as your GET endpoint
+
             return Results.Ok(new
             {
                 success = true,
@@ -91,6 +91,7 @@ public static class ThemeSettingEndpoints
                 }
             });
         }).RequireAuthorization();
+        // update user theme preferences
         app.MapPut("/api/theme-settings", async (
     ClaimsPrincipal user,
     PetPalDbContext db,
@@ -111,7 +112,7 @@ public static class ThemeSettingEndpoints
     }
 
     // Update the theme properties
-    userProfile.Theme = request.Theme ?? userProfile.Theme;  // Keep existing if null
+    userProfile.Theme = request.Theme ?? userProfile.Theme;
     userProfile.ColorAccent = request.ColorAccent ?? userProfile.ColorAccent;
     userProfile.FontSize = request.FontSize ?? userProfile.FontSize;
     userProfile.UseSystemPreference = request.UseSystemPreference;
@@ -134,6 +135,7 @@ public static class ThemeSettingEndpoints
         }
     });
 }).RequireAuthorization();
+        // reset user theme preferences to default
 app.MapDelete("/api/theme-settings", async (
     ClaimsPrincipal user,
     PetPalDbContext db) =>
@@ -152,11 +154,11 @@ app.MapDelete("/api/theme-settings", async (
         return Results.NotFound("User profile not found.");
     }
 
-    // Reset to default values
-    userProfile.Theme = "light";             // App default
-    userProfile.ColorAccent = "#4a90e2";     // App default
-    userProfile.FontSize = "medium";         // App default
-    userProfile.UseSystemPreference = false; // App default
+    //default values
+    userProfile.Theme = "light";            
+    userProfile.ColorAccent = "#4a90e2";   
+    userProfile.FontSize = "medium";         
+    userProfile.UseSystemPreference = false; 
     
     await db.SaveChangesAsync();
 
