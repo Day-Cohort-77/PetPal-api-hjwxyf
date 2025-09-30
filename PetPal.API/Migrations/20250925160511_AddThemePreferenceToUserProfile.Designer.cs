@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PetPal.API.Data;
@@ -11,9 +12,11 @@ using PetPal.API.Data;
 namespace PetPal.API.Migrations
 {
     [DbContext(typeof(PetPalDbContext))]
-    partial class PetPalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250925160511_AddThemePreferenceToUserProfile")]
+    partial class AddThemePreferenceToUserProfile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -455,12 +458,6 @@ namespace PetPal.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ColorAccent")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("#4a90e2");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -471,12 +468,6 @@ namespace PetPal.API.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<string>("FontSize")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("medium");
 
                     b.Property<string>("IdentityUserId")
                         .IsRequired()
@@ -490,19 +481,12 @@ namespace PetPal.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Theme")
+                    b.Property<string>("ThemeSettings")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("light");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("UseSystemPreference")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
 
                     b.HasKey("Id");
 
