@@ -109,7 +109,7 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
   [Fact]
   public async Task GetThemeSettings_ReturnsThemePreferences()
   {
-  
+
     var login = new LoginDto
     {
       Email = "admin@petpal.com",
@@ -127,7 +127,7 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     Assert.True((bool)result.success);
     Assert.Equal("Theme preferences retrieved successfully", (string)result.message);
 
-  
+
     Assert.NotNull(result.preferences);
     Assert.Equal("light", (string)result.preferences.theme);
     Assert.Equal("#4a90e2", (string)result.preferences.colorAccent);
@@ -158,15 +158,15 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     var result = JsonConvert.DeserializeObject<dynamic>(content);
     Assert.NotNull(result);
 
-    
+
     Assert.Equal("light", (string)result.preferences.theme);
     Assert.Equal("#4a90e2", (string)result.preferences.colorAccent);
     Assert.Equal("medium", (string)result.preferences.fontSize);
     Assert.True((bool)result.preferences.useSystemPreference);
   }
 
-[Fact]
- public async Task CreateTheme_ReturnsCreateThemeDto()
+  [Fact]
+  public async Task CreateTheme_ReturnsCreateThemeDto()
   {
     var login = new LoginDto
     {
@@ -180,9 +180,9 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
       FontSize = "medium",
       UseSystemPreference = false
     };
-   
+
     _authenticated_client = await GetAuthenticatedClientAsync(login);
-    var response = await _authenticated_client.PostAsJsonAsync("/api/theme-settings" , createThemeDto);
+    var response = await _authenticated_client.PostAsJsonAsync("/api/theme-settings", createThemeDto);
     var content = await response.Content.ReadAsStringAsync(); Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     var result = JsonConvert.DeserializeObject<dynamic>(content);
     Assert.NotNull(result);
@@ -213,16 +213,71 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     Assert.NotNull(result);
 
 
-   
+
     var getResponse = await _authenticated_client.GetAsync("/api/theme-settings");
     var getContent = await getResponse.Content.ReadAsStringAsync();
     var getResult = JsonConvert.DeserializeObject<dynamic>(getContent);
-    
-    Assert.Equal("light", (string)getResult.preferences.theme);        
-    Assert.Equal("#4a90e2", (string)getResult.preferences.colorAccent); 
-    Assert.Equal("medium", (string)getResult.preferences.fontSize);     
-    Assert.False((bool)getResult.preferences.useSystemPreference);     
-}
+
+    Assert.Equal("light", (string)getResult.preferences.theme);
+    Assert.Equal("#4a90e2", (string)getResult.preferences.colorAccent);
+    Assert.Equal("medium", (string)getResult.preferences.fontSize);
+    Assert.False((bool)getResult.preferences.useSystemPreference);
+  }
+
+  [Fact]
+  public async Task CreateTrainingProgress_ReturnsTrainingProgressDto()
+  {
+    // Arrange
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    var trainingProgressDto = new TrainingProgressCreateDto
+    {
+      Name = "New Training Name",
+      Goals = ["New Goal 1", "New Goal 2"],
+      PetId = 2
+    };
+
+    // Act
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await TestHelper.CreateTrainingProgressAsync(_authenticated_client, trainingProgressDto);
+
+    // Assert
+    Assert.NotNull(response);
+    Assert.Equal("New Training Name", response.Name);
+    Assert.Equal(["New Goal 1", "New Goal 2"], response.Goals);
+    Assert.Equal(2, response.PetId);
+
+  }
+
+  [Fact]
+  public async Task UpdateTrainingProgress_ReturnsTrainingProgressDto()
+  {
+    // Arrange
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    var trainingProgressDto = new TrainingProgressUpdateDto
+    {
+      Goals = ["New Goal 1", "New Goal 2"],
+      Hours = 6
+    };
+    var id = 1;
+
+    // Act
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await TestHelper.UpdateTrainingProgressAsync(_authenticated_client, trainingProgressDto, id);
+
+    // Assert
+    Assert.NotNull(response);
+    Assert.Equal(["New Goal 1", "New Goal 2"], response.Goals);
+    Assert.Equal(6, response.Hours);
+
+  }
 
   public void Dispose()
   {

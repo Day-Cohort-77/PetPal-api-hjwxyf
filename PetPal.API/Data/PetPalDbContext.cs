@@ -17,6 +17,7 @@ public class PetPalDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Medication> Medications { get; set; }
     public DbSet<Veterinarian> Veterinarians { get; set; }
+    public DbSet<TrainingProgress> TrainingProgresses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -36,24 +37,24 @@ public class PetPalDbContext : IdentityDbContext<IdentityUser>
                 }
             }
         }
-      
-     
 
-modelBuilder.Entity<UserProfile>()
-    .Property(p => p.Theme)
-    .HasDefaultValue("light");
 
-modelBuilder.Entity<UserProfile>()
-    .Property(p => p.ColorAccent)
-    .HasDefaultValue("#4a90e2");
 
-modelBuilder.Entity<UserProfile>()
-    .Property(p => p.FontSize)
-    .HasDefaultValue("medium");
+        modelBuilder.Entity<UserProfile>()
+            .Property(p => p.Theme)
+            .HasDefaultValue("light");
 
-modelBuilder.Entity<UserProfile>()
-    .Property(p => p.UseSystemPreference)
-    .HasDefaultValue(false);
+        modelBuilder.Entity<UserProfile>()
+            .Property(p => p.ColorAccent)
+            .HasDefaultValue("#4a90e2");
+
+        modelBuilder.Entity<UserProfile>()
+            .Property(p => p.FontSize)
+            .HasDefaultValue("medium");
+
+        modelBuilder.Entity<UserProfile>()
+            .Property(p => p.UseSystemPreference)
+            .HasDefaultValue(false);
 
         // Configure PetOwner as a join table
         modelBuilder.Entity<PetOwner>()
@@ -103,5 +104,11 @@ modelBuilder.Entity<UserProfile>()
             .WithMany(p => p.Medications)
             .HasForeignKey(m => m.PetId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure TrainingProgress relationships
+        modelBuilder.Entity<TrainingProgress>()
+            .HasOne(tp => tp.Pet)
+            .WithMany(p => p.TrainingProgresses)
+            .HasForeignKey(tp => tp.PetId);
     }
 }
