@@ -223,14 +223,19 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     Assert.Equal("medium", (string)getResult.preferences.fontSize);
     Assert.False((bool)getResult.preferences.useSystemPreference);
   }
-  [Fact]
+ 
+ 
+ [Fact]
   public async Task GetEmergencyServices_ReturnsExpectedData()
   {
+    // Arrange
     var login = new LoginDto
     {
       Email = "admin@petpal.com",
       Password = "Admin123!"
     };
+
+
     _authenticated_client = await GetAuthenticatedClientAsync(login);
     var response = await _authenticated_client.GetAsync("/api/emergency-services?latitude=37.7749&longitude=-122.4194");
     
@@ -256,10 +261,41 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     Assert.Equal("24/7 Pet Emergency Hospital", firstClinic.Name);
     Assert.Equal("emergency", firstClinic.Type);
   }
+  
+    [Fact]
+  public async Task CreateTrainingProgress_ReturnsTrainingProgressDto()
+  {
+    // Arrange
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+  
+    var trainingProgressDto = new TrainingProgressCreateDto
+    {
+      Name = "New Training Name",
+      Goals = ["New Goal 1", "New Goal 2"],
+      PetId = 2
+    };
+
+    // Act
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await TestHelper.CreateTrainingProgressAsync(_authenticated_client, trainingProgressDto);
+
+    // Assert
+    Assert.NotNull(response);
+    Assert.Equal("New Training Name", response.Name);
+    Assert.Equal(["New Goal 1", "New Goal 2"], response.Goals);
+    Assert.Equal(2, response.PetId);
+
+  }
+  
   [Fact]
   public async Task GetEmergencyServices_WithCoordinates_CalculatesDistancesCorrectly()
   { 
   
+    // Arrange
     var login = new LoginDto
     {
       Email = "admin@petpal.com",
@@ -281,12 +317,12 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
 
     foreach (var clinic in result.EmergencyServices)
     {
-      // Each clinic should have distance information
+   
       Assert.NotNull(clinic.Distance);
       Assert.True(clinic.Distance.Miles > 0);
       Assert.True(clinic.Distance.EstimatedDriveTimeMinutes > 0);
 
-      // Verify the math roughly matches expected distance
+
       double calculatedDistance = CalculateDistance(
           latitude,
           longitude,
@@ -328,7 +364,28 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
   {
     return degrees * Math.PI / 180;
   }
+  
+  [Fact]
+  public async Task UpdateTrainingProgress_ReturnsTrainingProgressDto()
+  {
 
+    var trainingProgressDto = new TrainingProgressUpdateDto
+    {
+      Goals = ["New Goal 1", "New Goal 2"],
+      Hours = 6
+    };
+    var id = 1;
+
+    // Act
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await TestHelper.UpdateTrainingProgressAsync(_authenticated_client, trainingProgressDto, id);
+
+    // Assert
+    Assert.NotNull(response);
+    Assert.Equal(["New Goal 1", "New Goal 2"], response.Goals);
+    Assert.Equal(6, response.Hours);
+
+  }
 
   public void Dispose()
   {
