@@ -109,7 +109,7 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
   [Fact]
   public async Task GetThemeSettings_ReturnsThemePreferences()
   {
-  
+
     var login = new LoginDto
     {
       Email = "admin@petpal.com",
@@ -127,7 +127,7 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     Assert.True((bool)result.success);
     Assert.Equal("Theme preferences retrieved successfully", (string)result.message);
 
-  
+
     Assert.NotNull(result.preferences);
     Assert.Equal("light", (string)result.preferences.theme);
     Assert.Equal("#4a90e2", (string)result.preferences.colorAccent);
@@ -158,15 +158,15 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     var result = JsonConvert.DeserializeObject<dynamic>(content);
     Assert.NotNull(result);
 
-    
+
     Assert.Equal("light", (string)result.preferences.theme);
     Assert.Equal("#4a90e2", (string)result.preferences.colorAccent);
     Assert.Equal("medium", (string)result.preferences.fontSize);
     Assert.True((bool)result.preferences.useSystemPreference);
   }
 
-[Fact]
- public async Task CreateTheme_ReturnsCreateThemeDto()
+  [Fact]
+  public async Task CreateTheme_ReturnsCreateThemeDto()
   {
     var login = new LoginDto
     {
@@ -180,9 +180,9 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
       FontSize = "medium",
       UseSystemPreference = false
     };
-   
+
     _authenticated_client = await GetAuthenticatedClientAsync(login);
-    var response = await _authenticated_client.PostAsJsonAsync("/api/theme-settings" , createThemeDto);
+    var response = await _authenticated_client.PostAsJsonAsync("/api/theme-settings", createThemeDto);
     var content = await response.Content.ReadAsStringAsync(); Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     var result = JsonConvert.DeserializeObject<dynamic>(content);
     Assert.NotNull(result);
@@ -213,16 +213,122 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     Assert.NotNull(result);
 
 
-   
+
     var getResponse = await _authenticated_client.GetAsync("/api/theme-settings");
     var getContent = await getResponse.Content.ReadAsStringAsync();
     var getResult = JsonConvert.DeserializeObject<dynamic>(getContent);
+
+    Assert.Equal("light", (string)getResult.preferences.theme);
+    Assert.Equal("#4a90e2", (string)getResult.preferences.colorAccent);
+    Assert.Equal("medium", (string)getResult.preferences.fontSize);
+    Assert.False((bool)getResult.preferences.useSystemPreference);
+  }
+  [Fact]
+  public async Task GetEmergencyServices_ReturnsExpectedData()
+  {
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await _authenticated_client.GetAsync("/api/emergency-services?latitude=37.7749&longitude=-122.4194");
     
-    Assert.Equal("light", (string)getResult.preferences.theme);        
-    Assert.Equal("#4a90e2", (string)getResult.preferences.colorAccent); 
-    Assert.Equal("medium", (string)getResult.preferences.fontSize);     
-    Assert.False((bool)getResult.preferences.useSystemPreference);     
-}
+    var content = await response.Content.ReadAsStringAsync();
+    output.WriteLine($"Response content: {content}");
+
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+    var result = JsonConvert.DeserializeObject<EmergencyServicesResponse>(content);
+    Assert.NotNull(result);
+
+    Assert.NotNull(result.EmergencyServices);
+    Assert.NotNull(result.EmergencyGuidelines);
+    Assert.NotNull(result.Pagination);
+
+  
+    Assert.True(result.EmergencyServices.Count > 0);
+
+    
+    var firstClinic = result.EmergencyServices[0];
+    Assert.Equal("clinic123", firstClinic.Id);
+    Assert.Equal("24/7 Pet Emergency Hospital", firstClinic.Name);
+    Assert.Equal("emergency", firstClinic.Type);
+  }
+  [Fact]
+  public async Task GetEmergencyServices_WithCoordinates_CalculatesDistancesCorrectly()
+  { 
+  
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    double latitude = 37.7749;
+    double longitude = -122.4194;
+
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await _authenticated_client.GetAsync("/api/emergency-services?latitude=37.7749&longitude=-122.4194");
+    var content = await response.Content.ReadAsStringAsync();
+    output.WriteLine($"Response content: {content}");
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+    var result = JsonConvert.DeserializeObject<EmergencyServicesResponse>(content);
+    Assert.NotNull(result);
+    Assert.NotNull(result.EmergencyServices);
+
+    foreach (var clinic in result.EmergencyServices)
+    {
+      // Each clinic should have distance information
+      Assert.NotNull(clinic.Distance);
+      Assert.True(clinic.Distance.Miles > 0);
+      Assert.True(clinic.Distance.EstimatedDriveTimeMinutes > 0);
+
+      // Verify the math roughly matches expected distance
+      double calculatedDistance = CalculateDistance(
+          latitude,
+          longitude,
+          clinic.Location.Latitude,
+          clinic.Location.Longitude);
+
+      Assert.Equal(Math.Round(calculatedDistance, 1), clinic.Distance.Miles);
+    }
+
+    // Verify sorting - closest first
+    for (int i = 0; i < result.EmergencyServices.Count - 1; i++)
+    {
+      Assert.True(
+          result.EmergencyServices[i].Distance.Miles <=
+          result.EmergencyServices[i + 1].Distance.Miles,
+          "Clinics should be sorted by distance (closest first)"
+      );
+    }
+  }
+
+  // Add this helper to your test class to verify distances
+  private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+  {
+    const double earthRadiusMiles = 3959;
+
+    var dLat = ToRadians(lat2 - lat1);
+    var dLon = ToRadians(lon2 - lon1);
+
+    var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+            Math.Cos(ToRadians(lat1)) * Math.Cos(ToRadians(lat2)) *
+            Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+    var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+    return earthRadiusMiles * c;
+  }
+
+  private double ToRadians(double degrees)
+  {
+    return degrees * Math.PI / 180;
+  }
+
 
   public void Dispose()
   {

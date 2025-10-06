@@ -146,6 +146,7 @@ app.MapHealthRecordEndpoints();
 app.MapAppointmentEndpoints();
 app.MapUserProfileEndpoints();
 app.MapThemeSettingEndpoints();
+app.MapEmergencyServicesEndpoints();
 // app.MapMedicationEndpoints();
 // app.MapVeterinarianEndpoints();
 
