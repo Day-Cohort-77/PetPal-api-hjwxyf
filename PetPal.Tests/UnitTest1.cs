@@ -225,6 +225,27 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
   }
 
   [Fact]
+  public async Task GetTrainingProgress_ReturnsTrainingProgressDto()
+  {
+    // Arrange
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    var petId = 1;
+
+    // Act
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await TestHelper.GetAllTrainingsAsync(_authenticated_client, petId);
+
+    // Assert
+    Assert.NotNull(response);
+    // Assert.Contains(response, r => r.Name == "TrainingName1");
+
+  }
+
+  [Fact]
   public async Task CreateTrainingProgress_ReturnsTrainingProgressDto()
   {
     // Arrange
