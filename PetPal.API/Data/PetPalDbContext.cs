@@ -105,6 +105,14 @@ public class PetPalDbContext : IdentityDbContext<IdentityUser>
             .HasForeignKey(m => m.PetId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Configure PrescribedBy as owned entity
+        modelBuilder.Entity<Medication>()
+            .OwnsOne(m => m.PrescribedBy, pb =>
+            {
+                pb.Property(p => p.Id).HasColumnName("PrescriberId");
+                pb.Property(p => p.Name).HasColumnName("PrescriberName");
+            });
+
         // Configure TrainingProgress relationships
         modelBuilder.Entity<TrainingProgress>()
             .HasOne(tp => tp.Pet)
