@@ -52,5 +52,10 @@ public class MappingProfiles : Profile
         CreateMap<Veterinarian, VeterinarianDto>();
         CreateMap<VeterinarianCreateDto, Veterinarian>();
         CreateMap<VeterinarianUpdateDto, Veterinarian>();
+
+        // TrainingProgress mappings
+        CreateMap<TrainingProgress, TrainingProgressDto>();
+        CreateMap<TrainingProgressCreateDto, TrainingProgress>();
+        CreateMap<TrainingProgressUpdateDto, TrainingProgress>();
     }
 }

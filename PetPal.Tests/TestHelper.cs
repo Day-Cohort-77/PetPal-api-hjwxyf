@@ -134,7 +134,40 @@ public static class TestHelper
         dbContext.SaveChanges();
 
     }
-    public static async Task<List<PetDto>> GetAllPetsAsync(HttpClient client)
+
+    public static void SeedTraining(PetPalDbContext dbContext)
+    {
+
+        var training1 = new TrainingProgress
+        {
+            Id = 1,
+            Name = "TrainingName1",
+            Goals = ["Sit", "Beg"],
+            Hours = 2,
+            PetId = 1
+        };
+        var training2 = new TrainingProgress
+        {
+            Id = 2,
+            Name = "TrainingName2",
+            Goals = ["Roll-over"],
+            Hours = 5,
+            PetId = 2
+        };
+        var training3 = new TrainingProgress
+        {
+            Id = 3,
+            Name = "TrainingName3",
+            Goals = ["Don't poop on things", "Don't pee on things", "Stop Tearing up the couch"],
+            Hours = 42,
+            PetId = 3
+        };
+
+        dbContext.TrainingProgresses.AddRange(training1, training2, training3);
+        dbContext.SaveChanges();
+
+    }
+    public static async Task<List<PetDto>?> GetAllPetsAsync(HttpClient client)
     {
         var response = await client.GetAsync("/pets");
         response.EnsureSuccessStatusCode();
@@ -144,13 +177,46 @@ public static class TestHelper
             PropertyNameCaseInsensitive = true
         });
     }
-    
-    public static async Task<UserUpdateResponseDto> UpdateUserProfileAsync(HttpClient client, UserUpdateDto userUpdateDto, int id)
+
+    public static async Task<UserUpdateResponseDto?> UpdateUserProfileAsync(HttpClient client, UserUpdateDto userUpdateDto, int id)
     {
         var response = await client.PutAsJsonAsync($"/users/{id}", userUpdateDto);
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<UserUpdateResponseDto>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+    }
+
+    public static async Task<List<TrainingProgressDto>?> GetAllTrainingsAsync(HttpClient client)
+    {
+        var response = await client.GetAsync("/training");
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<List<TrainingProgressDto>>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+    }
+
+    public static async Task<TrainingProgressDto?> CreateTrainingProgressAsync(HttpClient client, TrainingProgressCreateDto trainingProgressCreateDto)
+    {
+        var response = await client.PostAsJsonAsync($"/training", trainingProgressCreateDto);
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<TrainingProgressDto>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+    }
+
+    public static async Task<TrainingProgressDto?> UpdateTrainingProgressAsync(HttpClient client, TrainingProgressUpdateDto trainingProgressUpdateDto, int id)
+    {
+        var response = await client.PutAsJsonAsync($"/training/{id}", trainingProgressUpdateDto);
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<TrainingProgressDto>(content, new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         });

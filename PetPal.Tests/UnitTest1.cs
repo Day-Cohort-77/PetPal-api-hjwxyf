@@ -223,8 +223,63 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     Assert.Equal("medium", (string)getResult.preferences.fontSize);
     Assert.False((bool)getResult.preferences.useSystemPreference);
   }
+
   [Fact]
-  public async Task GetEmergencyServices_ReturnsExpectedData()
+  public async Task CreateTrainingProgress_ReturnsTrainingProgressDto()
+  {
+    // Arrange
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    var trainingProgressDto = new TrainingProgressCreateDto
+    {
+      Name = "New Training Name",
+      Goals = ["New Goal 1", "New Goal 2"],
+      PetId = 2
+    };
+
+    // Act
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await TestHelper.CreateTrainingProgressAsync(_authenticated_client, trainingProgressDto);
+
+    // Assert
+    Assert.NotNull(response);
+    Assert.Equal("New Training Name", response.Name);
+    Assert.Equal(["New Goal 1", "New Goal 2"], response.Goals);
+    Assert.Equal(2, response.PetId);
+
+  }
+
+  [Fact]
+  public async Task UpdateTrainingProgress_ReturnsTrainingProgressDto()
+  {
+    // Arrange
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    var trainingProgressDto = new TrainingProgressUpdateDto
+    {
+      Goals = ["New Goal 1", "New Goal 2"],
+      Hours = 6
+    };
+    var id = 1;
+
+    // Act
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var response = await TestHelper.UpdateTrainingProgressAsync(_authenticated_client, trainingProgressDto, id);
+
+    // Assert
+    Assert.NotNull(response);
+    Assert.Equal(["New Goal 1", "New Goal 2"], response.Goals);
+    Assert.Equal(6, response.Hours);
+
+  }
+  [Fact]
+   public async Task GetEmergencyServices_ReturnsExpectedData()
   {
     var login = new LoginDto
     {
