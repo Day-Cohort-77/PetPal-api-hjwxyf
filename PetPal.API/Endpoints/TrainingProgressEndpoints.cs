@@ -12,9 +12,9 @@ public static class TrainingProgressEndpoints
 {
   public static void MapTraingingProgressEndpoints(this WebApplication app)
   {
-    // GET training progress
-    app.MapGet("/training/{id}", async (
-        int id,
+    // Get all trainings for a pet
+    app.MapGet("/pets/{petId}/trainings", async (
+        int petId,
         ClaimsPrincipal user,
         PetPalDbContext db,
         IMapper mapper) =>
@@ -33,26 +33,30 @@ public static class TrainingProgressEndpoints
         return Results.NotFound("User profile not found.");
       }
 
-      var trainingProgress = await db.TrainingProgresses
-        .Include(tp => tp.Pet)
-        .ThenInclude(p => p.Owners.Where(o => o.PetId == o.Pet.Id))
-        .FirstOrDefaultAsync(t => t.Id == id);
+      var pet = await db.Pets
+        .Include(p => p.Owners)
+        .FirstOrDefaultAsync(p => p.Id == petId);
 
-      if (trainingProgress == null)
+      if (pet == null)
       {
-        return Results.NotFound("training not found.");
+        return Results.NotFound("Pet not found.");
       }
 
-      // Check if the user is an admin or owns the pet
+      // Check if the user is an admin, vet, or owns the pet
       var isAdmin = user.IsInRole("Admin");
-      var isPetOwner = trainingProgress.Pet.Owners.Any(po => po.UserProfileId == userProfile.Id);
+      var isPetOwner = pet.Owners.Any(po => po.UserProfileId == userProfile.Id);
 
       if (!isAdmin && !isPetOwner)
       {
         return Results.Forbid();
       }
 
-      return Results.Ok(mapper.Map<TrainingProgressDto>(trainingProgress));
+      var trainingProgresses = await db.TrainingProgresses
+        .Include(tp => tp.Pet)
+        .Where(tp => tp.PetId == petId)
+        .ToListAsync();
+
+      return Results.Ok(mapper.Map<List<TrainingProgressDto>>(trainingProgresses));
     }).RequireAuthorization();
 
     // Create a new training

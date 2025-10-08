@@ -29,6 +29,7 @@ public static class TestHelper
 
         // Seed sample data
         SeedPets(dbContext);
+        await SeedPetOwners(dbContext);
 
     }
 
@@ -135,6 +136,32 @@ public static class TestHelper
 
     }
 
+    private static async Task SeedPetOwners(PetPalDbContext context)
+    {
+
+        var petOwner1 = new PetOwner
+        {
+            PetId = 1,
+            UserProfileId = 1,
+            IsPrimaryOwner = true
+        };
+        var petOwner2 = new PetOwner
+        {
+            PetId = 2,
+            UserProfileId = 2,
+            IsPrimaryOwner = true
+        };
+        var petOwner3 = new PetOwner
+        {
+            PetId = 3,
+            UserProfileId = 3,
+            IsPrimaryOwner = false
+        };
+
+        context.PetOwners.AddRange(petOwner1, petOwner2, petOwner3);
+        await context.SaveChangesAsync();
+    }
+
     public static void SeedTraining(PetPalDbContext dbContext)
     {
 
@@ -189,9 +216,9 @@ public static class TestHelper
         });
     }
 
-    public static async Task<List<TrainingProgressDto>?> GetAllTrainingsAsync(HttpClient client)
+    public static async Task<List<TrainingProgressDto>?> GetAllTrainingsAsync(HttpClient client, int petId)
     {
-        var response = await client.GetAsync("/training");
+        var response = await client.GetAsync($"/pets/{petId}/trainings");
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<List<TrainingProgressDto>>(content, new JsonSerializerOptions
