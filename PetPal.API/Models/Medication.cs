@@ -11,8 +11,16 @@ public class Medication
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string Instructions { get; set; }
-    public string Prescriber { get; set; } // Name of the veterinarian who prescribed the medication
+    public PrescribedBy PrescribedBy { get; set; }
+    public string Status { get; set; } = "active";
+    public bool ReminderEnabled { get; set; } = true;
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+}
+
+public class PrescribedBy
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
 }

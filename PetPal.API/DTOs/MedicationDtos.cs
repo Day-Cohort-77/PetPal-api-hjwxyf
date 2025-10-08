@@ -11,8 +11,9 @@ public class MedicationDto
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string Instructions { get; set; }
-    public string Prescriber { get; set; }
-    public bool IsActive { get; set; }
+    public PrescribedByDto PrescribedBy { get; set; }
+    public string Status { get; set; } = "active";
+    public bool ReminderEnabled { get; set; } = true;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
@@ -26,7 +27,9 @@ public class MedicationCreateDto
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string Instructions { get; set; }
-    public string Prescriber { get; set; }
+    public PrescribedByDto PrescribedBy { get; set; }
+    public string Status { get; set; } = "active";
+    public bool ReminderEnabled { get; set; } = true;
 }
 
 public class MedicationUpdateDto
@@ -37,6 +40,14 @@ public class MedicationUpdateDto
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public string Instructions { get; set; }
-    public string Prescriber { get; set; }
+    public PrescribedByDto PrescribedBy { get; set; }
+    public string Status { get; set; }
+    public bool ReminderEnabled { get; set; }
     public bool IsActive { get; set; }
+}
+
+public class PrescribedByDto
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
 }

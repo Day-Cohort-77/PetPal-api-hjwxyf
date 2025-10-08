@@ -148,7 +148,7 @@ app.MapUserProfileEndpoints();
 app.MapThemeSettingEndpoints();
 app.MapEmergencyServicesEndpoints();
 app.MapTraingingProgressEndpoints();
-// app.MapMedicationEndpoints();
+app.MapMedicationEndpoints();
 // app.MapVeterinarianEndpoints();
 
 app.Run();

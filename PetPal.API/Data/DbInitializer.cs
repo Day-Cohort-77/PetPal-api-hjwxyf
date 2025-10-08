@@ -661,7 +661,13 @@ public static class DbInitializer
                     StartDate = DateTime.Now.AddMonths(-3),
                     EndDate = null, // Ongoing
                     Instructions = "Give with food",
-                    Prescriber = veterinarians[0].FirstName + " " + veterinarians[0].LastName,
+                    PrescribedBy = new PrescribedBy
+                    {
+                        Id = "vet001",
+                        Name = veterinarians[0].FirstName + " " + veterinarians[0].LastName
+                    },
+                    Status = "active",
+                    ReminderEnabled = true,
                     IsActive = true
                 },
                 new Medication
@@ -673,7 +679,13 @@ public static class DbInitializer
                     StartDate = DateTime.Now.AddMonths(-1),
                     EndDate = null, // Ongoing
                     Instructions = "Give with breakfast",
-                    Prescriber = veterinarians[0].FirstName + " " + veterinarians[0].LastName,
+                    PrescribedBy = new PrescribedBy
+                    {
+                        Id = "vet001",
+                        Name = veterinarians[0].FirstName + " " + veterinarians[0].LastName
+                    },
+                    Status = "active",
+                    ReminderEnabled = true,
                     IsActive = true
                 }
             });
@@ -693,7 +705,13 @@ public static class DbInitializer
                     StartDate = DateTime.Now.AddMonths(-2),
                     EndDate = null, // Ongoing
                     Instructions = "Apply to back of neck",
-                    Prescriber = veterinarians[1].FirstName + " " + veterinarians[1].LastName,
+                    PrescribedBy = new PrescribedBy
+                    {
+                        Id = "vet002",
+                        Name = veterinarians[1].FirstName + " " + veterinarians[1].LastName
+                    },
+                    Status = "active",
+                    ReminderEnabled = true,
                     IsActive = true
                 }
             });
@@ -713,7 +731,13 @@ public static class DbInitializer
                     StartDate = DateTime.Now.AddDays(-10),
                     EndDate = DateTime.Now.AddDays(4), // 14-day course
                     Instructions = "Give with food to prevent upset stomach",
-                    Prescriber = veterinarians[2].FirstName + " " + veterinarians[2].LastName,
+                    PrescribedBy = new PrescribedBy
+                    {
+                        Id = "vet003",
+                        Name = veterinarians[2].FirstName + " " + veterinarians[2].LastName
+                    },
+                    Status = "active",
+                    ReminderEnabled = true,
                     IsActive = true
                 },
                 new Medication
@@ -725,7 +749,13 @@ public static class DbInitializer
                     StartDate = DateTime.Now.AddDays(-10),
                     EndDate = DateTime.Now.AddDays(-3), // 7-day course
                     Instructions = "Give with food",
-                    Prescriber = veterinarians[2].FirstName + " " + veterinarians[2].LastName,
+                    PrescribedBy = new PrescribedBy
+                    {
+                        Id = "vet003",
+                        Name = veterinarians[2].FirstName + " " + veterinarians[2].LastName
+                    },
+                    Status = "completed",
+                    ReminderEnabled = false,
                     IsActive = false // Completed
                 }
             });

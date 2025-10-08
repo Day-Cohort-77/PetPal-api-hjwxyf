@@ -44,9 +44,13 @@ public class MappingProfiles : Profile
 
         // Medication mappings
         CreateMap<Medication, MedicationDto>()
-            .ForMember(dest => dest.PetName, opt => opt.MapFrom(src => src.Pet.Name));
-        CreateMap<MedicationCreateDto, Medication>();
-        CreateMap<MedicationUpdateDto, Medication>();
+            .ForMember(dest => dest.PetName, opt => opt.MapFrom(src => src.Pet.Name))
+            .ForMember(dest => dest.PrescribedBy, opt => opt.MapFrom(src => src.PrescribedBy));
+        CreateMap<MedicationCreateDto, Medication>()
+            .ForMember(dest => dest.PrescribedBy, opt => opt.MapFrom(src => src.PrescribedBy));
+        CreateMap<MedicationUpdateDto, Medication>()
+            .ForMember(dest => dest.PrescribedBy, opt => opt.MapFrom(src => src.PrescribedBy));
+        CreateMap<PrescribedBy, PrescribedByDto>().ReverseMap();
 
         // Veterinarian mappings
         CreateMap<Veterinarian, VeterinarianDto>();

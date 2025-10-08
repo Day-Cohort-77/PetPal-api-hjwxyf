@@ -300,7 +300,7 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
 
   }
   [Fact]
-   public async Task GetEmergencyServices_ReturnsExpectedData()
+  public async Task GetEmergencyServices_ReturnsExpectedData()
   {
     var login = new LoginDto
     {
@@ -309,7 +309,7 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     };
     _authenticated_client = await GetAuthenticatedClientAsync(login);
     var response = await _authenticated_client.GetAsync("/api/emergency-services?latitude=37.7749&longitude=-122.4194");
-    
+
     var content = await response.Content.ReadAsStringAsync();
     output.WriteLine($"Response content: {content}");
 
@@ -323,10 +323,10 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
     Assert.NotNull(result.EmergencyGuidelines);
     Assert.NotNull(result.Pagination);
 
-  
+
     Assert.True(result.EmergencyServices.Count > 0);
 
-    
+
     var firstClinic = result.EmergencyServices[0];
     Assert.Equal("clinic123", firstClinic.Id);
     Assert.Equal("24/7 Pet Emergency Hospital", firstClinic.Name);
@@ -334,8 +334,8 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
   }
   [Fact]
   public async Task GetEmergencyServices_WithCoordinates_CalculatesDistancesCorrectly()
-  { 
-  
+  {
+
     var login = new LoginDto
     {
       Email = "admin@petpal.com",
@@ -409,5 +409,27 @@ public class UnitTests : IClassFixture<TestWebApplicationFactory>, IDisposable
   public void Dispose()
   {
     _client.Dispose();
+  }
+
+  [Fact]
+  public async Task GetPetMedications_ReturnsAllMedicationsForPet()
+  {
+    // Arrange
+    var login = new LoginDto
+    {
+      Email = "admin@petpal.com",
+      Password = "Admin123!"
+    };
+    var petId = 1; // Use a known pet ID from seeded data
+
+    // Act
+    _authenticated_client = await GetAuthenticatedClientAsync(login);
+    var medications = await TestHelper.GetPetMedicationsAsync(_authenticated_client, petId);
+
+    // Assert
+    Assert.NotNull(medications);
+    Assert.Contains(medications, m => m.Name == "Amoxicillin"); // Based on seeded data
+    Assert.Contains(medications, m => m.PetId == petId);
+    Assert.All(medications, m => Assert.Equal(petId, m.PetId));
   }
 }
